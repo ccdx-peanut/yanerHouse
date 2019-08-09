@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="掩耳租房后台管理员页面">
+    <meta name="keywords" content="掩耳租房后台管理 ">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <title>掩耳用户管理模块界面</title>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/vue-resource.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/common.css" />
+    <link rel="stylesheet" type="text/css" href="css/slide.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/flat-ui.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/jquery.nouislider.css">
+</head>
+<body>
+<div id="userApp">
+    <!--用户管理模块-->
+    <div role="tabpanel" class="tab-pane" id="user">
+        <div class="check-div form-inline">
+            <!-- 该div由于页面变为左右占用了原来的位置，所以进行留白处理 -->
+            <div class="col-xs-2"></div>
+            <!-- 添加用户 -->
+            <div class="col-xs-6">
+                <button class="btn btn-yellow btn-xs" data-toggle="modal" data-target="#addUser">添加用户</button>
+            </div>
+            <!-- 用户模糊查询 -->
+            <div class="col-lg-4 col-xs-2">
+                <input type="text" class="form-control input-sm" placeholder="输入文字搜索">
+                <button class="btn btn-white btn-xs ">查 询</button>
+            </div>
+        </div>
+        <div class="data-div">
+            <div class="row tableHeader">
+                <!-- 留白 -->
+                <div class="col-xs-2 ">留白</div>
+                <div class="col-xs-1 ">编码</div>
+                <div class="col-xs-1">用户名</div>
+                <div class="col-xs-1">密码</div>
+                <div class="col-xs-1">邮箱</div>
+                <div class="col-xs-1">性别</div>
+                <div class="col-xs-1">电话</div>
+                <div class="col-xs-1">身份证</div>
+                <div class="col-xs-1">姓名</div>
+                <div class="col-xs-2">操作</div>
+            </div>
+            <div class="tablebody" v-for="myUser in usersData" :key="myUser.user_id">
+                <div class="row">
+                    <div class="col-xs-2 ">留白</div>
+                    <div class="col-xs-1 ">{{myUser.user_id}}</div>
+                    <div class="col-xs-1">{{myUser.user_name}}</div>
+                    <div class="col-xs-1">{{myUser.user_password}}</div>
+                    <div class="col-xs-1">{{myUser.user_email}}</div>
+                    <div class="col-xs-1">{{myUser.user_six}}</div>
+                    <div class="col-xs-1 ">{{myUser.user_phone}}</div>
+                    <div class="col-xs-1">{{myUser.user_IdCard}}</div>
+                    <div class="col-xs-1">{{myUser.user_realName}}</div>
+                    <div class="col-xs-2">
+                        <button type="button" class="btn btn-success btn-xs"
+                                data-toggle="modal" data-target="#reviseUser"
+                                @click="modifyPre(myUser)">修 改</button>
+                        <button class="btn btn-danger btn-xs" data-toggle="modal"
+                                data-target="#deleteUser" @click="removePre(myUser)">禁 用</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--页码块-->
+        <footer class="footer">
+            <ul class="pagination">
+                <li><select>
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                    <option>6</option>
+                    <option>7</option>
+                    <option>8</option>
+                    <option>9</option>
+                    <option>10</option>
+                </select> 页</li>
+                <li class="gray">共20页</li>
+                <li><i class="glyphicon glyphicon-menu-left"> </i></li>
+                <li><i class="glyphicon glyphicon-menu-right"> </i></li>
+            </ul>
+        </footer>
+        <!--弹出添加用户窗口-->
+        <!-- 对应的button -->
+        <!-- 	style="overflow: auto" 超出modal出滚动条 -->
+        <div class="modal fade" style="overflow: auto" id="addUser" role="dialog" aria-labelledby="gridSystemModalLabel">
+            <div class="modal-dialog " role="document">
+                <div class="modal-content ">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="emptyModal()">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title" id="gridSystemModalLabel">添加用户</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <form class="form-horizontal">
+                                <div class="form-group ">
+                                    <label id="sName" class="col-xs-3 control-label">用户名：</label>
+                                    <div class="col-xs-8 ">
+                                        <input type="text" class="form-control input-sm duiqi"
+                                               id="add_user_name" v-model="myUser.user_name">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label id="sPassword" class="col-xs-3 control-label">密码：</label>
+                                    <div class="col-xs-8 ">
+                                        <input type="text" class="form-control input-sm duiqi"
+                                               id="add_user_password" v-model="myUser.user_password">
+                                    </div>
+                                </div>
+                                <div class="form-group ">
+                                    <label id="sEmail" class="col-xs-3 control-label">邮箱：</label>
+                                    <div class="col-xs-8 ">
+                                        <input type="text" class="form-control input-sm duiqi"
+                                            id="add_user_email" v-model="myUser.user_email">
+                                    </div>
+                                </div>
+                                <div class="form-group ">
+                                    <label id="sPhone" class="col-xs-3 control-label">手机号：</label>
+                                    <div class="col-xs-8 ">
+                                        <input type="text" class="form-control input-sm duiqi"
+                                            id="add_user_phone" v-model="myUser.user_phone">
+                                     </div>
+                                </div>
+                                <div class="form-group">
+                                    <label id="sIdCard" class="col-xs-3 control-label">身份证：</label>
+                                    <div class="col-xs-8">
+                                        <input type="text" class="form-control input-sm duiqi"
+                                            id="add_user_IdCard" v-model="myUser.user_IdCard">
+                                    </div>
+                                 </div>
+                                <div class="form-group">
+                                    <label id="sRealname" class="col-xs-3 control-label">真实姓名：</label>
+                                    <div class="col-xs-8 ">
+                                        <input type="text" class="form-control input-sm duiqi"
+                                               id="add_user_realName" v-model="myUser.user_realName">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label id="sSix" class="col-xs-3 control-label">性别：</label>
+                                    <div class="col-xs-8">
+                                        <select class=" form-control select-duiqi" id="add_user_six" v-model="myUser.user_six">
+                                            <option value="1" selected="selected">男</option>
+                                            <option value="2">女</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-xs btn-white"
+                                data-dismiss="modal" @click="emptyModal()">取 消</button>
+                        <button type="button" class="btn btn-xs btn-green"
+                                @click="userAdd">添 加</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+        <!--弹出修改用户窗口-->
+        <div class="modal fade" style="overflow: auto" id="reviseUser" role="dialog" aria-labelledby="myModalLabel" tabindex="-1">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-label="Close" @click="emptyModal()">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">修改用户</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <form class="form-horizontal">
+                                <!-- 隐藏的input 为了取到ID的值 -->
+                                <input type="hidden" class="form-control input-sm duiqi" id="add_user_id" v-model="myUser.user_id">
+                                <div class="form-group ">
+                                    <label for="sName" class="col-xs-3 control-label">用户名：</label>
+                                    <div class="col-xs-8 ">
+                                        <input type="text" class="form-control input-sm duiqi"
+                                               id="modify_user_name" v-model="myUser.user_name">
+                                    </div>
+                                </div>
+                                <div class="form-group ">
+                                    <label for="sName" class="col-xs-3 control-label">密码：</label>
+                                    <div class="col-xs-8 ">
+                                        <input type="text" class="form-control input-sm duiqi"
+                                               id="modify_user_password" v-model="myUser.user_password">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="sEmail" class="col-xs-3 control-label">邮箱：</label>
+                                    <div class="col-xs-8 ">
+                                        <input type="text" class="form-control input-sm duiqi"
+                                               id="modify_user_email" v-model="myUser.user_email">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="sPhone" class="col-xs-3 control-label">电话：</label>
+                                    <div class="col-xs-8">
+                                        <input type="text" class="form-control input-sm duiqi"
+                                               id="modify_user_phone" v-model="myUser.user_phone">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="sIdCard" class="col-xs-3 control-label">身份证：</label>
+                                    <div class="col-xs-8">
+                                        <input type="text" class="form-control input-sm duiqi"
+                                               id="modify_user_IdCard" v-model="myUser.user_IdCard">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="sRealname" class="col-xs-3 control-label">姓名：</label>
+                                    <div class="col-xs-8">
+                                        <input type="text" class="form-control input-sm duiqi"
+                                               id="modify_user_realName" v-model="myUser.user_realName">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-xs btn-white"
+                                data-dismiss="modal" @click="emptyModal()">取 消</button>
+                        <button type="button" class="btn btn-xs btn-green"
+                                @click="userModify(myUser)">修 改</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+
+        <!--弹出删除用户警告窗口-->
+        <div class="modal fade" id="deleteUser" role="dialog"
+             aria-labelledby="gridSystemModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <!-- @click="emptyModal()" -->
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-label="Close" @click="emptyModal()">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title" id="gridSystemModalLabel">提示</h4>
+                    </div>
+                    <div class="modal-body">
+                        <!-- 记录ID -->
+                        <input id="remove_user_id" type="hidden" v-model="myUser.id" />
+
+                        <div class="container-fluid">确定要禁用该用户？禁用后不可恢复！</div>
+                    </div>
+                    <div class="modal-footer">
+                        <!-- @click="emptyModal()" -->
+                        <button type="button" class="btn btn-xs btn-white"
+                                data-dismiss="modal" @click="emptyModal()">取 消</button>
+                        <button type="button" class="btn  btn-xs btn-danger"
+                                @click="userRemove(myUser)">禁 用</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+    </div>
+</div>
+
+<script type="text/javascript">
+    //var this = flag;
+    var users = new Vue({
+        //对应的DIV的ID
+        el:"#userApp",
+        //存储数据
+        data:{
+            usersData: [],
+            myUser: {},
+        },
+        //自定义的方法
+        methods:{
+            //得到所有的用户信息
+            showUsers(){
+                this.$http.post('http://localhost:9088/getUsers')
+                    .then(result=>{
+                        console.log(result.bodyText);
+                        //把JSON字符串变成JSON对象
+                        this.usersData=JSON.parse(result.bodyText);
+                    })
+            },
+            //添加用户
+            userAdd(myUser){
+                console.log("添加用户")
+                console.log(this.myUser)
+                this.$http.post('http://localhost:9088/addUser',this.myUser,{emulateJSON:true})
+                    .then(result=>{
+                        if(result.bodyText=="addUser001"){
+                            console.log("添加用户成功");
+                            $('#addUser').modal('hide');
+                            //关闭模态窗体
+                            alert("用户添加成功")
+                            //添加用户信息后成功后 刷新
+                            this.showUsers();
+                        }else if (result.bodyText=="addUser002") {
+                            console.log("用户名重复");
+                            $('#addUser').modal('hide');
+                            //关闭模态窗体
+                            alert("用户名重复！")
+                        }else if (result.bodyText=="addUser003") {
+                            console.log("添加用户失败");
+                            $('#addUser').modal('hide');
+                            //关闭模态窗体
+                            alert("添加失败")
+                        }
+
+                    })
+            },
+            //修改用户
+            userModify(myUser){
+                console.log("修改用户")
+                console.log(this.myUser)
+                this.$http.post('http://localhost:9088/updateUser',this.myUser,{emulateJSON:true})
+                    .then(result=>{
+                        console.log("修改成功");
+                        $('#reviseUser').modal('hide');
+                        //关闭模态窗体
+                        alert("用户修改成功")
+                        //添加成功后 刷新
+                        this.showUsers();
+                    })
+            },
+            //修改预处理
+            modifyPre(myUser){
+                //修改前的准备，把模态框展示，数据回显
+                this.myUser = myUser;
+                console.log("this.myUser:")
+                console.log(this.myUser)
+            },
+            removePre(myUser){
+                //删除前的准备，把模态框展示，数据回显
+                this.myUser = myUser;
+                console.log("this.myUser:")
+                console.log(this.myUser)
+            },
+            //删除用户
+            userRemove(myUser){
+                console.log("禁用用户")
+                this.$http.post('http://localhost:9088/deleteUser',this.myUser,{emulateJSON:true})
+                    .then(result=>{
+                        console.log("禁用成功");
+                        //删除成功后 刷新
+                        $('#deleteUser').modal('hide');
+                        //关闭模态窗体
+                        alert("用户已被禁用！")
+                        this.showUsers();
+                    })
+            },
+            //清空弹出框modal
+            emptyModal(){
+                this.myUser={};
+            },
+            //判断是否登陆
+            isLogin(){
+                this.$http.post('http://localhost:9088/isLogin')
+                    .then(result=>{
+                        if(result.bodyText=="isLoginInfo002"){
+                            //代表未登录，需要跳转到登陆页面
+                            window.location.href = "http://localhost:9088/login.html";
+                            //提示登陆
+                            alert("请先登陆")
+                        }else{
+                            this.showUsers()
+                        }
+                    })
+            },
+        },
+        created() {
+            this.isLogin()
+            //初始化完毕data和methods
+            //this.showUsers()
+        },
+    });
+
+</script>
+</body>
+</html>

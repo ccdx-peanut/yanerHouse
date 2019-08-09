@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+
+<html xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="掩耳租房后台管理员页面">
+    <meta name="keywords" content="掩耳租房后台管理 ">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <title>掩耳租房欢迎界面</title>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/vue-resource.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/common.css" />
+    <link rel="stylesheet" type="text/css" href="css/slide.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/flat-ui.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/jquery.nouislider.css">
+</head>
+<body>
+<div id="infoApp">
+<div style="margin: 180px 580px;width: 400px;height: 70px">
+    <span style="font-size: 50px;font-weight: bold">掩耳租房欢迎您！</span>
+</div>
+    <button  style="display: none" class="btn btn-danger btn-xs" data-toggle="modal" id="isHaveInfoButton"
+            data-target="#haveInfo" @click="haveDealInfo()">>点击查询</button>
+</div>
+
+<!--弹出提示信息窗口-->
+<div class="modal fade" id="haveInfo" role="dialog"
+     aria-labelledby="gridSystemModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <!-- @click="emptyModal()" -->
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close" >
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="gridSystemModalLabel">新消息提醒</h4>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">您有未通过审批处理的房源，请尽快处理</div>
+            </div>
+            <div class="modal-footer">
+                <!-- @click="emptyModal()" -->
+                <button type="button" class="btn  btn-xs btn-danger"
+                        data-dismiss="modal" >取 消</button>
+                <button type="button" class="btn  btn-xs btn-default"
+                ><a href="againIssue.html">查 看</a></button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+
+<script type="text/javascript">
+    var infos = new Vue({
+        el: "infoApp",
+        data:{
+
+        },
+        methods: {
+            haveDealInfo(){
+                this.$http.post('http://localhost:9088/haveDealInfo01')
+                    .then(result=>{
+                        if (result.bodyText=="isHaveDealInfo001") {
+                            document.getElementById("isHaveInfoButton").click()
+                        }else{
+                            alert("掩耳租房欢迎您！")
+                        }
+                    })
+            },
+            //判断是否登陆
+            isLogin(){
+                this.$http.post('http://localhost:9088/isLogin')
+                    .then(result=>{
+                        if(result.bodyText=="isLoginInfo002"){
+                            //代表未登录，需要跳转到登陆页面
+                            window.location.href = "http://localhost:9088/login.html";
+                            //提示登陆
+                            alert("请先登陆")
+                        }else{
+                            this.haveDealInfo();
+                        }
+                    })
+            },
+
+        },
+        created() {
+            this.isLogin()
+        },
+    });
+
+</script>
+</body>
+</html>

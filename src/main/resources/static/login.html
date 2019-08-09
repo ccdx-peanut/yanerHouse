@@ -1,0 +1,87 @@
+<!DOCTYPE html >
+<html>
+<head>
+	<title>登录页面</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="./Wopop_files/style_log.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" type="text/css" href="./Wopop_files/style.css">
+	<link rel="stylesheet" type="text/css" href="./Wopop_files/userpanel.css">
+
+
+</head>
+
+<body class="login">
+
+	<div class="login_m">
+		<div class="login_logo">
+			<p style="font-size: 30px;">掩耳租房后台管理系统</p>
+		</div>
+
+		<div class="login_boder">
+
+			<div class="login_padding" id="login_model">
+				<!--<form name="myLogin" action="loginJudge" method="post">-->
+					<h2>用户名</h2>
+					<label> <input type="text" id="admin_name" name="user_name"
+						class="txt_input txt_input2"
+						onfocus="if (value ==&#39;Your name&#39;){value =&#39;&#39;}"
+						onblur="if (value ==&#39;&#39;){value=&#39;Your name&#39;}"
+						value="Your name" >
+					</label>
+					<h2>密码</h2>
+					<label> <input type="password" name="user_password"
+						id="admin_password" class="txt_input"
+						onfocus="if (value ==&#39;******&#39;){value =&#39;&#39;}"
+						onblur="if (value ==&#39;&#39;){value=&#39;******&#39;}"
+						value="******" >
+					</label>
+
+					<p class="forgot">
+						<a id="iforget" href="findPassword.html">忘记密码?</a>
+					</p>
+					<div class="rem_sub">
+						<!--onclick="loginAjax()"-->
+						<label> <input type="submit" class="sub_buttons"
+							name="button" id="login" value="登录" style="opacity: 0.7;" onclick="loginAjax()" >
+						</label>
+					</div>
+				<!--</form>-->
+			</div>
+		</div>
+	</div>
+
+<script type="text/javascript">
+function loginAjax() {
+	var request = new XMLHttpRequest();
+	var admin_name = document.getElementById("admin_name").value;
+	var admin_password = document.getElementById("admin_password").value;
+	var sendInfo = admin_name + "-" + admin_password;
+/*	alert(sendInfo)*/
+	request.onreadystatechange = function () {
+		if (request.readyState == 4) {
+			var returnLoginInfo = request.responseText;
+
+			if (returnLoginInfo == "login001") {
+				//普通管理员成功页面
+				window.location.href = "http://localhost:9088/index.html";
+			} else if (returnLoginInfo == "login002") {
+				//超级管理员成功页面
+				window.location.href = "http://localhost:9088/adminIndex.html";
+			} else if (returnLoginInfo == "login003") {
+				alert("用户名或者密码错误！")
+			} else if (returnLoginInfo == "login004") {
+				alert("账号已被禁用！")
+			}
+		}
+	};
+		request.open("post", "http://localhost:9088/loginJudge", true);
+		request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		request.send("sendInfo=" + sendInfo);
+
+
+}
+</script>
+
+
+</body>
+</html>

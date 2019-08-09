@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="description" content="掩耳租房后台管理员页面">
+<meta name="keywords" content="掩耳租房后台管理 ">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no">
+<title>掩耳租房后台管理首页</title>
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/vue-resource.min.js"></script>
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="css/common.css" />
+<link rel="stylesheet" type="text/css" href="css/slide.css" />
+<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="css/flat-ui.min.css" />
+<link rel="stylesheet" type="text/css" href="css/jquery.nouislider.css">
+</head>
+<body>
+	<div id="wrap">
+		<!-- 左侧菜单栏目块 -->
+		<div class="leftMeun" id="leftMeun">
+			<div id="logoDiv">
+				<p id="logoP">
+					<img id="logo" alt="掩耳租房" src="images/logo.png"><span>掩耳租房管理系统</span>
+				</p>
+			</div>
+			<div id="personInfor">
+				<p id="userName">{{admin_name}}</p>
+				<p>
+					<a @click="emptyLogin()">退出登录</a>
+				</p>
+			</div>
+			<div class="meun-title">我的信息</div>
+			<div class="meun-item" href="#sour" aria-controls="user" role="tab"
+				 data-toggle="tab"  @click="shipMyInfo()">
+				<a href="myInfo.html" target="mainDiv">
+					<img src="images/icon_card_grey.png">我的信息</a>
+			</div>
+			<div class="meun-title">人员管理</div>
+			<div class="meun-item" href="#sour" aria-controls="user" role="tab"
+				 data-toggle="tab"  @click="shipAdminUserManage()">
+				<a href="adminUserManage.html" target="mainDiv">
+					<img src="images/icon_chara_grey.png">用户管理</a>
+			</div>
+			<div class="meun-item" href="#sour" aria-controls="user" role="tab"
+				data-toggle="tab"  @click="shipAdminStaffManage()">
+				<a href="adminStaffManage.html" target="mainDiv">
+					<img src="images/icon_chara_grey.png">员工管理</a>
+			</div>
+			<div class="meun-item" href="#chan" aria-controls="chan" role="tab"
+				data-toggle="tab"  @click="shipAdminSteManage()">
+				<a href="adminSteManage.html" target="mainDiv">
+					<img src="images/icon_chara_grey.png">管家管理</a>
+			</div>
+			<div class="meun-title">房源管理</div>
+			<div class="meun-item" href="#scho" aria-controls="scho" role="tab"
+				data-toggle="tab"  @click="shipAdminHouseManage()">
+				<a href="adminHouseManage.html" target="mainDiv">
+					<img src="images/icon_house_grey.png">房屋管理</a>
+			</div>
+
+			<div class="meun-item" href="#sour" aria-controls="scho" role="tab" @click="shipAdminRentManage()"
+				data-toggle="tab" >
+				<a href="adminRentManage.html" target="mainDiv">
+					<img src="images/icon_source.png">租用管理</a>
+			</div>
+
+			<div class="meun-item" href="#sour" aria-controls="scho" role="tab" @click="shipAdminApproval()"
+				data-toggle="tab"  >
+				<a href="adminApproval.html" target="mainDiv">
+					<img src="images/icon_change_grey.png">租用审批</a>
+			</div>
+		</div>
+		<!--name="_blank"-->
+		<!-- 右侧具体内容栏目 -->
+		<div id="iframe">
+		<iframe name="mainDiv" src="indexInfo02.html" width='100%' height='620px' frameborder='0'
+				id="_blank"></iframe>
+		</div>
+	</div>
+	<script type="text/javascript">
+		//var this = flag;
+		var users = new Vue({
+			//对应的DIV的ID
+			el:"#wrap",
+			//存储数据
+			data:{
+				admin_name:'',
+			},
+			//自定义的方法
+			methods:{
+				//得到所有的用户信息
+				showLoginInfo(){
+					this.$http.post('http://localhost:9088/getLoginInfo')
+							.then(result=>{
+								console.log(result.bodyText);
+								//把JSON字符串变成JSON对象
+								//this.admin_name=JSON.parse(result.bodyText);
+								this.admin_name = result.bodyText;
+							})
+				},
+				//退出登陆
+				emptyLogin(){
+					this.$http.post('http://localhost:9088/emptyLogin')
+							.then(result=>{
+								if(result.bodyText=="emptyLogin001"){
+									//退出成功，返回登陆页面
+									window.location.href = "http://localhost:9088/login.html";
+								}else {
+									//退出登陆失败
+									alert("操作发生意外的错误")
+								}
+							})
+				},
+				//跳转的超链接
+				shipMyInfo(){
+					$("#iframe").html('<iframe name="mainDiv" src="myInfo.html" width="100%" height="620" name="_blank" id="_blank"></iframe>')
+				},
+				shipAdminUserManage(){
+					$("#iframe").html('<iframe name="mainDiv" src="adminUserManage.html" width="100%" height="620" name="_blank" id="_blank"></iframe>')
+				},
+				shipAdminStaffManage(){
+					$("#iframe").html('<iframe name="mainDiv" src="adminStaffManage.html" width="100%" height="620" name="_blank" id="_blank"></iframe>')
+				},
+				shipAdminSteManage(){
+					$("#iframe").html('<iframe name="mainDiv" src="adminSteManage.html" width="100%" height="620" name="_blank" id="_blank"></iframe>')
+				},
+				shipAdminHouseManage(){
+					$("#iframe").html('<iframe name="mainDiv" src="adminHouseManage.html" width="100%" height="620" name="_blank" id="_blank"></iframe>')
+				},
+				shipAdminRentManage(){
+					$("#iframe").html('<iframe name="mainDiv" src="adminRentManage.html" width="100%" height="620" name="_blank" id="_blank"></iframe>')
+				},
+				shipAdminApproval(){
+					$("#iframe").html('<iframe name="mainDiv" src="adminApproval.html" width="100%" height="620" name="_blank" id="_blank"></iframe>')
+				},
+				//判断是否登陆
+				isLogin(){
+					this.$http.post('http://localhost:9088/isLogin')
+							.then(result=>{
+								if(result.bodyText=="isLoginInfo002"){
+									//代表未登录，需要跳转到登陆页面
+									window.location.href = "http://localhost:9088/login.html";
+									//提示登陆
+									alert("请先登陆")
+								}else{
+									//登陆过，找到登陆的信息
+									this.showLoginInfo();
+
+								}
+							})
+				},
+			},
+			created() {
+				//初始化完毕data和methods，判断是否登陆
+				this.isLogin()
+			},
+		});
+
+	</script>
+
+</body>
+
+</html>

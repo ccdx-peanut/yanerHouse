@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+
+<html xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="掩耳租房后台管理员页面">
+    <meta name="keywords" content="掩耳租房后台管理 ">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <title>掩耳租房房源管理界面</title>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/vue-resource.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/common.css" />
+    <link rel="stylesheet" type="text/css" href="css/slide.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/flat-ui.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/jquery.nouislider.css">
+</head>
+<body>
+<div id="houseManageApp">
+    <!--房源信息管理模块-->
+    <div role="tabpanel" class="tab-pane" id="user">
+        <div class="check-div form-inline">
+            <!-- 该div由于页面变为左右占用了原来的位置，所以进行留白处理 -->
+            <div class="col-xs-2"></div>
+            <!-- 添加用户 -->
+            <div class="col-xs-6">
+            </div>
+            <!-- 房源信息模糊查询 -->
+            <div class="col-lg-4 col-xs-2">
+                <input type="text" class="form-control input-sm" placeholder="输入文字搜索">
+                <button class="btn btn-white btn-xs ">查 询</button>
+            </div>
+        </div>
+        <div class="data-div">
+            <div class="row tableHeader">
+                <!-- 留白 -->
+                <div class="col-xs-2 ">留白</div>
+                <div class="col-xs-1 ">编码</div>
+                <div class="col-xs-2">所属街道</div>
+                <div class="col-xs-1">小区信息</div>
+                <div class="col-xs-1">面积(m²)</div>
+                <div class="col-xs-1">押金￥</div>
+                <div class="col-xs-1">房屋状态</div>
+                <div class="col-xs-1">审批状态</div>
+                <div class="col-xs-2">操作</div>
+            </div>
+            <div class="tablebody" v-for="myHouse in housesData" :key="myHouse.house_id">
+                <div class="row">
+                    <div class="col-xs-2 ">留白</div>
+                    <div class="col-xs-1 ">{{myHouse.house_id}}</div>
+                    <div class="col-xs-2">{{myHouse.house_street}}</div>
+                    <div class="col-xs-1">{{myHouse.house_xq}}</div>
+                    <div class="col-xs-1">{{myHouse.house_area}}</div>
+                    <div class="col-xs-1">{{myHouse.house_money}}</div>
+                    <div class="col-xs-1">{{myHouse.house_state}}</div>
+                    <div class="col-xs-1 ">{{myHouse.isApproval}}</div>
+                    <div class="col-xs-2">
+                        <button type="button" class="btn btn-success btn-xs"
+                                data-toggle="modal" data-target="#particularInfo"
+                                @click="updatePre(myHouse)">修 改</button>
+                        <button type="button" class="btn btn-danger btn-xs"
+                                data-toggle="modal" data-target="#houseRemove"
+                                @click="removePre(myHouse)">下 架</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--页码块-->
+        <footer class="footer">
+            <ul class="pagination">
+                <li><select>
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                    <option>6</option>
+                    <option>7</option>
+                    <option>8</option>
+                    <option>9</option>
+                    <option>10</option>
+                </select> 页</li>
+                <li class="gray">共20页</li>
+                <li><i class="glyphicon glyphicon-menu-left"> </i></li>
+                <li><i class="glyphicon glyphicon-menu-right"> </i></li>
+            </ul>
+        </footer>
+
+        <!--弹出修改房源信息窗口-->
+        <div class="modal fade" style="overflow: auto" id="particularInfo" role="dialog" aria-labelledby="myModalLabel" tabindex="-1">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-label="Close" @click="emptyModal()">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">详细信息</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <form class="form-horizontal">
+                                <!-- 隐藏的input 为了取到ID的值 -->
+                                <input type="hidden" class="form-control input-sm duiqi" id="check_house_id" v-model="myHouse.house_id">
+                                <div class="form-group ">
+                                    <label for="check_house_sentType" class="col-xs-3 control-label">出租方式：</label>
+                                    <div class="col-xs-8 ">
+                                        <select v-model="sentTypeSelected" id="check_house_sentType" class=" form-control select-duiqi">
+                                            <option v-for="option in sentTypeOpinions" v-bind:value="option.value" >
+                                                {{ option.text }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group ">
+                                    <label for="check_house_street" class="col-xs-3 control-label">所属街道：</label>
+                                    <div class="col-xs-8 ">
+                                        <input type="text" class="form-control input-sm duiqi"
+                                               id="check_house_street" v-model="myHouse.house_street">
+                                    </div>
+                                </div>
+                                <div class="form-group ">
+                                    <label for="check_house_xq" class="col-xs-3 control-label">小区信息：</label>
+                                    <div class="col-xs-8 ">
+                                        <input type="text" class="form-control input-sm duiqi"
+                                               id="check_house_xq" v-model="myHouse.house_xq">
+                                    </div>
+                                </div>
+                                <div class="form-group ">
+                                    <label for="check_house_roof" class="col-xs-3 control-label">楼层信息：</label>
+                                    <div class="col-xs-8 ">
+                                        <input type="text" class="form-control input-sm duiqi"
+                                               id="check_house_roof" v-model="myHouse.house_roof">
+                                    </div>
+                                </div>
+                                <div class="form-group ">
+                                    <label for="check_house_shape" class="col-xs-3 control-label">房屋户型：</label>
+                                    <div class="col-xs-8 ">
+                                        <select v-model="houseShapeSelected" id="check_house_shape" class=" form-control select-duiqi">
+                                            <option v-for="option in houseShapeOpinions" v-bind:value="option.value" >
+                                                {{ option.text }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group ">
+                                    <label for="check_house_area" class="col-xs-3 control-label">面积(m²)：</label>
+                                    <div class="col-xs-8 ">
+                                        <input type="text" class="form-control input-sm duiqi"
+                                               id="check_house_area" v-model="myHouse.house_area">
+                                    </div>
+                                </div>
+                                <div class="form-group ">
+                                    <label for="check_house_money" class="col-xs-3 control-label">租金￥(元)：</label>
+                                    <div class="col-xs-8 ">
+                                        <input type="text" class="form-control input-sm duiqi"
+                                               id="check_house_money" v-model="myHouse.house_money">
+                                    </div>
+                                </div>
+                                <div class="form-group ">
+                                    <label for="check_house_moneyType" class="col-xs-3 control-label">押金形式：</label>
+                                    <div class="col-xs-8 ">
+                                        <select v-model="moneyTypeSelected" id="check_house_moneyType" class=" form-control select-duiqi">
+                                            <option v-for="option in moneyTypeOpinions" v-bind:value="option.value">
+                                                {{ option.text }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group ">
+                                    <label for="check_house_title" class="col-xs-3 control-label">租房标题：</label>
+                                    <div class="col-xs-8 ">
+                                        <input type="text" class="form-control input-sm duiqi"
+                                               id="check_house_title" v-model="myHouse.house_title">
+                                    </div>
+                                </div>
+                                <div class="form-group ">
+                                    <label  class="col-xs-3 control-label" >房源标签：</label>
+                                    <div class="col-xs-8 ">
+                                        <label><input name="add_house_flag" type="checkbox" value="houseFlag1" v-model="checkedNames"/>首次出租 </label>
+                                        <label><input name="add_house_flag" type="checkbox" value="houseFlag2" v-model="checkedNames"/>临近地铁 </label>
+                                        <label><input name="add_house_flag" type="checkbox" value="houseFlag3" v-model="checkedNames"/>小区优美 </label><br>
+                                        <label><input name="add_house_flag" type="checkbox" value="houseFlag4" v-model="checkedNames"/>交通便捷 </label>
+                                        <label><input name="add_house_flag" type="checkbox" value="houseFlag5" v-model="checkedNames"/>学区房 </label>
+                                        <label><input name="add_house_flag" type="checkbox" value="houseFlag6" v-model="checkedNames"/>精装修 </label><br>
+                                        <label><input name="add_house_flag" type="checkbox" value="houseFlag7" v-model="checkedNames"/>无押金 </label>
+                                        <label><input name="add_house_flag" type="checkbox" value="houseFlag8" v-model="checkedNames"/>深呼吸 </label>
+                                        <label><input name="add_house_flag" type="checkbox" value="houseFlag9" v-model="checkedNames"/>短租 </label>
+                                    </div>
+                                </div>
+                                <div class="form-group ">
+                                    <label for="check_house_image" class="col-xs-3 control-label">房源图片：</label>
+                                    <img id="check_house_image" width="150px" height="150px">
+
+                                </div>
+                                <div class="form-group ">
+                                    <label for="check_house_state" class="col-xs-3 control-label">房屋状态：</label>
+                                    <div class="col-xs-8 ">
+                                        <b><input type="text" class="form-control input-sm duiqi"readonly="readonly"
+                                                  id="check_house_state" v-model="myHouse.house_state"></b>
+                                    </div>
+                                </div>
+                                <div class="form-group ">
+                                    <label for="check_isApproval" class="col-xs-3 control-label">审批状态：</label>
+                                    <div class="col-xs-8 ">
+                                        <b><input type="text" class="form-control input-sm duiqi"readonly="readonly"
+                                                  id="check_isApproval" v-model="myHouse.isApproval"></b>
+                                    </div>
+                                </div>
+                                <div class="form-group ">
+                                    <label for="check_admin_issue" class="col-xs-3 control-label">发布人：</label>
+                                    <div class="col-xs-8 ">
+                                        <b><input type="text" class="form-control input-sm duiqi" readonly="readonly"
+                                                  id="check_admin_issue" v-model="myHouse.admin_issue"></b>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-xs btn-white"
+                                data-dismiss="modal" @click="emptyModal()">取 消</button>
+                        <button type="button" class="btn btn-xs btn-green"
+                                @click="updateHouse(myHouse)">修 改</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+        <!--弹出下架房源警告窗口-->
+        <div class="modal fade" id="houseRemove" role="dialog"
+             aria-labelledby="gridSystemModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <!-- @click="emptyModal()" -->
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-label="Close" @click="emptyModal()">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title" id="gridSystemModalLabel">提示</h4>
+                    </div>
+                    <div class="modal-body">
+                        <!-- 记录ID -->
+                        <input id="remove_house_id" type="hidden" v-model="myHouse.id" />
+
+                        <div class="container-fluid">确定要下架该房源？下架后不可恢复！</div>
+                    </div>
+                    <div class="modal-footer">
+                        <!-- @click="emptyModal()" -->
+                        <button type="button" class="btn btn-xs btn-white"
+                                data-dismiss="modal" @click="emptyModal()">取 消</button>
+                        <button type="button" class="btn  btn-xs btn-danger"
+                                @click="removeHouse(myHouse)">禁 用</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    var approvals = new Vue({
+        //对应的DIV的ID
+        el:"#houseManageApp",
+        //存储数据
+        data:{
+            housesData: [],
+            myHouse: {},
+            checkedNames: [],
+            sentTypeSelected:'',
+            sentTypeOpinions:[
+                {text:'合租',value:'sentType1'},
+                {text:'整租',value:'sentType2'},
+            ],
+            houseShapeSelected:'',
+            houseShapeOpinions:[
+                {text:'一室一厅',value:'shape1'},
+                {text:'两室一厅',value:'shape2'},
+                {text:'三室一厅',value:'shape3'},
+                {text:'三室两厅',value:'shape4'},
+                {text:'四室一厅',value:'shape5'},
+                {text:'四室两厅',value:'shape6'},
+            ],
+            moneyTypeSelected:'',
+            moneyTypeOpinions:[
+                {text:'押一付一',value:'moneyType1'},
+                {text:'押一付二',value:'moneyType2'},
+                {text:'押一付三',value:'moneyType3'},
+                {text:'无押金',value:'moneyType4'},
+            ],
+        },
+        //自定义的方法
+        methods:{
+            //得到所有的用户信息
+            showHouses(){
+                this.$http.post('http://localhost:9088/getHouses')
+                    .then(result=>{
+                        console.log(result.bodyText);
+                        //把JSON字符串变成JSON对象
+                        this.housesData=JSON.parse(result.bodyText);
+                    })
+            },
+            //修改预处理
+            updatePre(myHouse){
+                //修改前的准备，把模态框展示，数据回显
+                this.myHouse = myHouse;
+                //把下拉框和多选框初始化赋值
+                this.sentTypeSelected = this.myHouse.house_sentType;
+                this.houseShapeSelected = this.myHouse.house_shape;
+                this.moneyTypeSelected = this.myHouse.house_moneyType;
+
+                this.checkedNames = this.myHouse.house_flag.split(",");
+                console.log("this.myHouse:")
+                console.log(this.myHouse)
+                document.getElementById("check_house_image").src = "images/"+this.myHouse.house_image;
+            },
+            //重新发布
+            updateHouse(myHouse){
+                //获取下拉框的值
+                this.myHouse.house_sentType = this.sentTypeSelected;
+                this.myHouse.house_shape = this.houseShapeSelected;
+                this.myHouse.house_moneyType = this.moneyTypeSelected;
+                //获取多选框的值
+                this.myHouse.house_flag = this.checkedNames.join(",");
+                console.log("this.myHouse:")
+                console.log(this.myHouse)
+                this.$http.post('http://localhost:9088/updateHouse',this.myHouse,{emulateJSON:true})
+                    .then(result=>{
+                        if (result.bodyText=="updateHouseInfo001"){
+                            //关闭模态窗体
+                            $('#particularInfo').modal('hide');
+                            //操作成功后 刷新
+                            this.showHouses();
+                            alert("修改房源成功")
+                        }else if (result.bodyText=="updateHouseInfo002"){
+                            //关闭模态窗体
+                            $('#particularInfo').modal('hide');
+                            alert("修改房源失败")
+                        }
+                    })
+            },
+            //清空弹出框modal
+            emptyModal(){
+                this.myHouse={};
+            },
+            //删除前的准备，把模态框展示，数据回显
+            removePre(myHouse){
+                this.myHouse = myHouse;
+                console.log("this.myHouse:")
+                console.log(this.myHouse)
+            },
+            //下架房源
+            removeHouse(myHouse){
+                console.log("下架房源")
+                this.$http.post('http://localhost:9088/deleteHouse',this.myHouse,{emulateJSON:true})
+                    .then(result=>{
+                        if (result.bodyText=="deleteHouse001"){
+                            //关闭模态窗体
+                            $('#houseRemove').modal('hide');
+                            //操作成功后 刷新
+                            this.showHouses();
+                            alert("房源已下架！")
+                        }else if (result.bodyText=="deleteHouse002"){
+                            //关闭模态窗体
+                            $('#houseRemove').modal('hide');
+                            alert("操作失败！")
+                        }
+                    })
+            },
+            //判断是否登陆
+            isLogin(){
+                this.$http.post('http://localhost:9088/isLogin')
+                    .then(result=>{
+                        if(result.bodyText=="isLoginInfo002"){
+                            //代表未登录，需要跳转到登陆页面
+                            window.location.href = "http://localhost:9088/login.html";
+                            //提示登陆
+                            alert("请先登陆")
+                        }else{
+                            this.showHouses()
+                        }
+                    })
+            },
+        },
+        created() {
+            this.isLogin()
+            //初始化完毕data和methods
+            //this.showHouses()
+        },
+    });
+
+</script>
+</body>
+</html>
